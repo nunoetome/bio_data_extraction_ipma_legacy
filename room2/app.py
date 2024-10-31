@@ -25,9 +25,9 @@ def main():
     ini_logging()
     LOGGER.info(">>>>>>>>> Starting application IPMA RSS downloader <<<<<<<<<")
     
-    LOGGER.debug("starting download_ipma_rss_comunicados")
+    LOGGER.debug("starting worker_ipma_api_av_met_3")
     worker_ipma_api_av_met_3()
-    LOGGER.debug("finished download_ipma_rss_comunicados")
+    LOGGER.debug("finished worker_ipma_api_av_met_3")
     
     LOGGER.info(">>>>>>>>> Application finished <<<<<<<<<")
 

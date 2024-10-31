@@ -1,0 +1,1 @@
+[{"text": "", "awarenessTypeName": "Agita\\u00e7\\u00e3o Mar\\u00edtima", "idAreaAviso": "BGC", "startTime": "2024-10-19T11:20:00", "awarenessLevelID": "green", "endTime": "2024-10-22T11:00:00"}]

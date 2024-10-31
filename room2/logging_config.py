@@ -25,8 +25,8 @@
 
 
 import logging
-import inspect
-import os
+#import inspect
+#import os
 
 
 # ----------------- LOG CONFIGURATION -----------------
@@ -47,9 +47,9 @@ LOG_LEVEL_FILE = logging.DEBUG
 #LOG_LEVEL_FILE = logging.CRITICAL
 
 #LOG_LEVEL_CONSOLE = logging.DEBUG
-#LOG_LEVEL_CONSOLE = logging.INFO
+LOG_LEVEL_CONSOLE = logging.INFO
 #LOG_LEVEL_CONSOLE = logging.WARNING
-LOG_LEVEL_CONSOLE = logging.ERROR
+#LOG_LEVEL_CONSOLE = logging.ERROR
 #LOG_LEVEL_CONSOLE = logging.CRITICAL
 
 LOG_OUTPUT_FILE = 'app.log'
@@ -59,7 +59,7 @@ LOG_OUTPUT_FILE = 'app.log'
 # of a log messages of this application. This helps the bulk analysis of log files
 # preventing the confusion with date and time information
 # It stands for "My Python Logging System"
-LOG_FORMAT_FILE = '<<mpls>> %(asctime)s - %(name)s - %(levelname)s - %(message)s' 
+LOG_FORMAT_FILE = '<<mpls>> %(asctime)s - %(levelname)s - %(message)s' 
 LOG_FORMAT_CONSOLE = '<<mpls>> %(levelname)s - %(message)s'
 
 # ULTRA_DEBUG mode
