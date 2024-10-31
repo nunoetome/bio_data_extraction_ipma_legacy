@@ -53,57 +53,13 @@ HISTORIC_FILE = 'datasets/ipma_api_av_met_3/ipma_api_av_met_3_history.txt'
 DATASET_FILE_NAME = f"{DATASET_ID}.txt"
 DATASET_FILE_PATH = DATASET_FILE_NAME
 #DATASET_FILE_PATH = f"{DATASET_FOLDER}/{DATASET_FILE_NAME}"
+FILE_MAX_NUMBER_REGISTERS = 100 # 1MB
 # ---------------------------------------------------------------
 
 #TODO: implement the following functions
 # Function to check if the purged response is empty
-def purged_api_response_is_empty(purged_api_response):
+def __purged_api_response_is_empty(purged_api_response):
     return False
-
-# Function to remove duplicated information
-def __purge_api_response (api_response_input):
-    LOGGER.debug("Purging API response")
-    LOGGER.debug("Processing file: %s", DATASET_FILE_PATH)
-    
-    api_response = api_response_input
-    
-    #opens the file DATASET_FILE_PATH and loads the existing data
-    if not os.path.exists(DATASET_FILE_PATH):
-        LOGGER.error("File %s does not exist", DATASET_FILE_PATH)
-        return ""
-    
-    # Load the existing data from the file DATASET_FILE_PATH
-    try:
-        LOGGER.debug("Loading existing data from file: %s", DATASET_FILE_PATH)
-        with open(DATASET_FILE_PATH, 'r', encoding='utf-8') as file:
-            try:
-                file_content = file.read()
-            except (IOError, OSError) as e:
-                LOGGER.critical("Failed to read from file %s: %s", DATASET_FILE_PATH, e)
-                return ""
-            if file_content.strip():
-                existing_data = json.loads(file_content)
-            else:
-                existing_data = []
-    except (IOError, OSError, json.JSONDecodeError) as e:
-        LOGGER.critical("Failed to load existing data from file %s: %s", DATASET_FILE_PATH, e)
-        return ""
- 
-    # Compare the existing data with the new data
-    # Iterate over each item in the existing data
-    LOGGER.debug("For each item in the existing data compare with the new data")
-    count_item_n = 1
-    for old_file_item in existing_data:
-        LOGGER.debug("Processing item nº: %s from file", count_item_n)
-        # Iterate over each item in the parsed API response
-        for new_api_item in api_response:
-            LOGGER.debug("Processing new item: %s from API", count_item_n)
-            if new_api_item == old_file_item:
-                LOGGER.warning("Found duplicated item: %s", new_api_item)
-            else:
-                existing_data.append(new_api_item)
-                LOGGER.debug("Item %s is not duplicated", new_api_item) 
-    return existing_data
 
 
 # Main function, the one that is called by the exterior
@@ -126,10 +82,10 @@ def worker_ipma_api_av_met_3():
         
         
     # If the purged response is empty, ends the process
-    #TODO: #4 veroify if the purged response is empty
-    if not purged_api_response_is_empty(purged_api_response):
+    #TODO: verify if the purged response is empty
+    if not __purged_api_response_is_empty(api_response):
         LOGGER.warning("Purged API response is empty, no need to save it to a file")
-     
+  
     # adds the response to the existing data file
     #TODO: #5 implement the function to add the new info to the file
     # don't add duplicated information
