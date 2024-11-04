@@ -49,13 +49,19 @@ API_URL = "https://api.ipma.pt/open-data/forecast/warnings/warnings_www.json"
 DATASET_ID = 'ipma_api_av_met_3'
 DATASET_DESCRIPTION = 'Dataset containing api data from IPMA'
 DATASET_FOLDER = 'datasets/ipma_api_av_met_3'
-HISTORIC_FILE = 'datasets/ipma_api_av_met_3/ipma_api_av_met_3_history.txt'
-DATASET_FILE_NAME = f"{DATASET_ID}.txt"
-DATASET_FILE_PATH = DATASET_FILE_NAME
-#DATASET_FILE_PATH = f"{DATASET_FOLDER}/{DATASET_FILE_NAME}"
+#HISTORIC_FILE = 'datasets/ipma_api_av_met_3/ipma_api_av_met_3_history.txt'
+DATASET_FILE_NAME = f"{DATASET_ID}.json"
+#DATASET_FILE_PATH = DATASET_FILE_NAME
+DATASET_FILE_PATH = f"{DATASET_FOLDER}/{DATASET_FILE_NAME}"
 FILE_MAX_NUMBER_REGISTERS = 100 # 1MB
 # ---------------------------------------------------------------
 
+
+def __saves_api_data_to_new_file(api_response):
+
+    with open(DATASET_FILE_PATH, 'w', encoding='utf-8') as file:
+        file.write(json.dumps([api_response.text]))
+    return
 
 # Save the final file to the disk, replacing the oll one
 # to ensure that the information is not lost, keep a copy
@@ -76,7 +82,7 @@ def __save_api_data_to_file(purged_api_response):
     return
     
     
-def __add_api_response_to_file(api_response):
+def __add_api_response_to_dataset(api_response):
 
     # check if the folder or file exists, if not, creates it and saves the 
     # response as is and exits the function
@@ -88,13 +94,18 @@ def __add_api_response_to_file(api_response):
         except OSError as e:
             LOGGER.critical("Failed to create folder %s: %s", DATASET_FOLDER, e)
             return
-    if not os.path.exists(HISTORIC_FILE):
-        with open(HISTORIC_FILE, 'w', encoding='utf-8') as file:
-            file.write(json.dumps([api_response.text]))
+        __saves_api_data_to_new_file(api_response)
+        LOGGER.debug("API data saved to new file: %s", DATASET_FILE_PATH)
+        return
+
+    # if the file does not exist, saves the response as 
+    # is and exits the function
+    if not os.path.exists(DATASET_FILE_PATH):
+        __saves_api_data_to_new_file(api_response)
         return
 
     # if the data file already exists, read it
-    with open(HISTORIC_FILE, 'r', encoding='utf-8') as file:
+    with open(DATASET_FILE_PATH, 'r', encoding='utf-8') as file:
         historic_data = json.loads(file.read())
 
     # For the existing file, add JUST the new data to it adds the response
@@ -103,7 +114,18 @@ def __add_api_response_to_file(api_response):
         if register not in historic_data:
             historic_data.append(register)
 
-    return historic_data
+        # Save the final file to the disk, replacing the oll one
+    # to ensure that the information is not lost, keep a copy
+    # of the old file in a historic folder
+    # the file name should include the ordinal number 
+    # so that the most recent file is always the one with the
+    # highest number.
+    #TODO: #9 change saving process to save the file with a new name
+    __save_api_data_to_file(historic_data)
+
+    return
+
+
 
 #TODO: implement the following functions
 # Function to check if the purged response is empty
@@ -115,6 +137,7 @@ def __purged_api_response_is_empty(purged_api_response):
 # This function is responsible for downloading api information
 # from IPMA and saving it to a file
 def worker_ipma_api_av_met_3():
+
     LOGGER.info("Downloading api data from %s", DATASET_ID)
     
     # get the data from the API to a temporary variable
@@ -137,23 +160,15 @@ def worker_ipma_api_av_met_3():
         return
     LOGGER.debug("Purged API response is not empty")
 
+    
 
     #TODO: #8 implement the function to add the new info to the file
     # don't add duplicated information
     # limit the number of items in the file to a parameter
     # given in the configuration
-    final_data = __add_api_response_to_file(api_response)
-    
-    # Save the final file to the disk, replacing the oll one
-    # to ensure that the information is not lost, keep a copy
-    # of the old file in a historic folder
-    # the file name should include the ordinal number 
-    # so that the most recent file is always the one with the
-    # highest number.
-    #TODO: #9 change saving process to save the file with a new name
-    __save_api_data_to_file(final_data)
+    __add_api_response_to_dataset(api_response)
 
-    pass
+    return
 
 # Test function
 # This is not going to used in production
